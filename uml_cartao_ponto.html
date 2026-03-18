@@ -1,0 +1,77 @@
+
+<div id="uml" style="padding: 1rem 0"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const { svg } = await mermaid.render('uml-svg', `classDiagram
+  class Departamento {
+    - int id
+    - String nome
+    + getId() int
+    + getNome() String
+  }
+
+  class Funcionario {
+    - int id
+    - String matricula
+    - String nomeCompleto
+    - Departamento departamento
+    + getId() int
+    + getMatricula() String
+    + getNomeCompleto() String
+    + getDepartamento() Departamento
+  }
+
+  class RegistroPonto {
+    - int id
+    - int funcionarioId
+    - LocalDateTime dataHora
+    + getId() int
+    + getFuncionarioId() int
+    + getDataHora() LocalDateTime
+  }
+
+  class ConnectionFactory {
+    - String URL
+    - String USER
+    - String PASSWORD
+    + getConnection() Connection
+  }
+
+  class FuncionarioDAO {
+    + buscarPorId(int id) Funcionario
+  }
+
+  class RegistroPontoDAO {
+    + buscarPorFuncionarioEData(int id, LocalDate data) List
+  }
+
+  class Main {
+    + main(String[] args) void
+  }
+
+  Departamento "1" --> "0..*" Funcionario : possui
+  Funcionario "1" --> "0..*" RegistroPonto : possui
+  FuncionarioDAO ..> ConnectionFactory : usa
+  FuncionarioDAO ..> Funcionario : retorna
+  FuncionarioDAO ..> Departamento : retorna
+  RegistroPontoDAO ..> ConnectionFactory : usa
+  RegistroPontoDAO ..> RegistroPonto : retorna
+  Main ..> FuncionarioDAO : usa
+  Main ..> RegistroPontoDAO : usa
+`);
+document.getElementById('uml').innerHTML = svg;
+</script>
